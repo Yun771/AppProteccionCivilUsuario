@@ -36,7 +36,7 @@ class NavigatorBarCustom extends StatelessWidget {
                 Icons.record_voice_over,
                 size: 40,
               ),
-              label: 'Consejos'),
+              label: 'Recomendación'),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.info_outline_rounded,

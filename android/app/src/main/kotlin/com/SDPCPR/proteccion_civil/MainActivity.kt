@@ -1,4 +1,4 @@
-package com.example.proteccion_civil
+package com.SDPCPR.ProteccionCivil
 
 import io.flutter.embedding.android.FlutterActivity
 

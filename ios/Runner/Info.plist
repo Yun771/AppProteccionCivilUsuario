@@ -11,7 +11,12 @@
 	
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background.</string>
-    
+
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>Permitir usar el teléfono</string>
+	</array>
+		
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

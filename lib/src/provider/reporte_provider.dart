@@ -7,12 +7,15 @@ class ReporteProvider {
   final _url = 'https://dbpcpr-default-rtdb.firebaseio.com/';
 
   Future<bool> enviarReporte(ReporteModel reporte) async {
-    final url = '$_url/Reportes.json';
-    final resp = await http.post(url, body: reporteModelToJson(reporte));
+    try {
+      final url = '$_url/Reportes.json';
+      final resp = await http.post(url, body: reporteModelToJson(reporte));
 
-    final decodata = json.decode(resp.body);
+      final decodata = json.decode(resp.body);
 
-    print(decodata);
-    return true;
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

@@ -11,8 +11,19 @@ class _RecomenacionPageState extends State<RecomendacionPage> {
   final recomendacionesProvider = new RecomendacionProvider();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
     recomendacionesProvider.cargarRecomendaciones();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    recomendacionesProvider.dispoStream();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Container(child: _cardsBuilder()),
     );
@@ -21,7 +32,7 @@ class _RecomenacionPageState extends State<RecomendacionPage> {
   Widget _cardsBuilder() {
     return StreamBuilder(
       stream: recomendacionesProvider.recomendacionesStream,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         if (snapshot.hasData) {
           final comunidados = snapshot.data;
           return CardsPersonalizada(cardsdata: comunidados);

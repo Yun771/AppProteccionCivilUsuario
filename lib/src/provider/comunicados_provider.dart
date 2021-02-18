@@ -24,22 +24,31 @@ class ComunicadosProvider {
 
   Future<List<CardModel>> cargarComunicados() async {
     final url = '$_url/Comunicados.json';
-    final resp = await http.get(url);
+    try {
+      final resp = await http.get(url);
 
-    final Map<String, dynamic> decodedata = json.decode(resp.body);
+      if (resp.statusCode == 200) {
+        
+        final Map<String, dynamic> decodedata = json.decode(resp.body);
 
-    if (decodedata == null) return [];
+        if (decodedata == null) return [];
 
-    decodedata.forEach((id, comunicado) {
-      final comuTemp = CardModel.fromJson(comunicado);
+        decodedata.forEach((id, comunicado) {
+          final comuTemp = CardModel.fromJson(comunicado);
 
-      comuTemp.id = id;
+          comuTemp.id = id;
 
-      _comunicados.add(comuTemp);
-    });
+          _comunicados.add(comuTemp);
+        });
 
-    comunicadoSink(_comunicados);
+        comunicadoSink(_comunicados);
 
-    return _comunicados;
+        return _comunicados;
+      } else {
+        return throw Exception("network connection failed");
+      }
+    } catch (e) {
+      return throw Exception("!!!!Error");
+    }
   }
 }

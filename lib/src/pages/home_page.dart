@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ui_provider = Provider.of<UIProvider>(context);
-    return Scaffold(
+    return Scaffold(      
       appBar: AppBarCustom(),
       body: HomePageBody(),
       bottomNavigationBar: NavigatorBarCustom(),

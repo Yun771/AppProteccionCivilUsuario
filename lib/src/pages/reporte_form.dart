@@ -14,7 +14,9 @@ class FormReporte extends StatefulWidget {
 }
 
 class _FormReporteState extends State<FormReporte> {
-  TextEditingController _textEditController = TextEditingController();
+  TextEditingController _textEditControllerDireccion = TextEditingController();
+  TextEditingController _textEditControllerTipoReporte =
+      TextEditingController();
   String _direccion;
   Position _posicionObtenida = Position();
   Completer<GoogleMapController> _mapController = Completer();
@@ -29,10 +31,19 @@ class _FormReporteState extends State<FormReporte> {
   final formKey = GlobalKey<FormState>();
   final scaffKeyRe = GlobalKey<ScaffoldState>();
 
+  bool _disableTextField = false;
+
   @override
   Widget build(BuildContext context) {
     String _tipoReporte = ModalRoute.of(context).settings.arguments;
     reporte.tipoReporte = _tipoReporte;
+
+    _textEditControllerTipoReporte.text = _tipoReporte;
+
+    if (_tipoReporte == 'Otro') {
+      _disableTextField = true;
+      _textEditControllerTipoReporte.text = '';
+    }
 
     return Scaffold(
         key: scaffKeyRe,
@@ -56,6 +67,8 @@ class _FormReporteState extends State<FormReporte> {
                 ),
                 SizedBox(height: 15.0),
                 _crearInputName(),
+                Divider(),
+                _crearInputTipoReporte(),
                 Divider(),
                 _crearInputTelefono(),
                 Divider(),
@@ -92,6 +105,29 @@ class _FormReporteState extends State<FormReporte> {
             icon: Icon(Icons.account_circle_rounded)));
   }
 
+  Widget _crearInputTipoReporte() {
+    return TextFormField(
+        enabled: _disableTextField,
+        controller: _textEditControllerTipoReporte,
+        onSaved: (value) => reporte.tipoReporte = value,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        validator: (value) {
+          if (value.length < 3) {
+            return 'Ingrese el tipo de reporte';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
+            labelText: 'Tipo de Reporte',
+            hintText: 'Tipo de Reporte',
+            helperText: 'Tipo de Reporte',
+            icon: Icon(Icons.article_rounded)));
+  }
+
   Widget _crearInputTelefono() {
     return TextFormField(
         onSaved: (valor) => reporte.telefono = int.parse(valor),
@@ -126,7 +162,7 @@ class _FormReporteState extends State<FormReporte> {
         color: Color(0xFFFB6409),
         minWidth: 5.0,
         onPressed: () {
-          _determinePosition();
+          _myPosition();
         },
         child: Icon(
           Icons.location_on,
@@ -135,11 +171,16 @@ class _FormReporteState extends State<FormReporte> {
         ),
       ),
       title: TextFormField(
+        readOnly: true,
         validator: (value) {
-          return null;
+          if (value.isEmpty) {
+            return 'Presionel botón para obtener su dirección';
+          } else {
+            return null;
+          }
         },
         onSaved: (valor) => reporte.direccion = valor,
-        controller: _textEditController,
+        controller: _textEditControllerDireccion,
         keyboardType: TextInputType.streetAddress,
         decoration: InputDecoration(
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -158,8 +199,13 @@ class _FormReporteState extends State<FormReporte> {
       height: 300,
       width: double.infinity,
       child: GoogleMap(
+        scrollGesturesEnabled: false,
+        zoomControlsEnabled: false,
         markers: markers,
-        myLocationEnabled: true,
+        onLongPress: (argument) {
+          print(argument);
+        },
+        myLocationEnabled: false,
         initialCameraPosition: _position,
         mapType: MapType.normal,
         onMapCreated: (GoogleMapController controller) {
@@ -169,31 +215,8 @@ class _FormReporteState extends State<FormReporte> {
     );
   }
 
-  Future<void> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permantly denied, we cannot request permissions.');
-    }
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
-        return Future.error(
-            'Location permissions are denied (actual value: $permission).');
-      }
-    }
-
-    _posicionObtenida = await Geolocator.getCurrentPosition();
+  _myPosition() async {
+    _posicionObtenida = await determinePosition();
 
     final GoogleMapController controller = await _mapController.future;
 
@@ -212,10 +235,9 @@ class _FormReporteState extends State<FormReporte> {
         _posicionObtenida.longitude.toString();
 
     setState(() {});
-    print(_direccion);
 
     if (_direccion != null) {
-      _textEditController.text = _direccion;
+      _textEditControllerDireccion.text = _direccion;
     }
   }
 
@@ -230,18 +252,21 @@ class _FormReporteState extends State<FormReporte> {
         onPressed: _submit);
   }
 
-  void _submit() {
+  void _submit() async {
     if (!formKey.currentState.validate()) return;
     formKey.currentState.save();
 
     reporte.fecha = getDate();
 
-    reportePovider.enviarReporte(reporte);
+    bool enviado = await reportePovider.enviarReporte(reporte);
 
-    mostrarSnackBar('Registro Guardado');
     FocusScope.of(context).requestFocus(FocusNode());
 
-    Navigator.pushNamed(context, '/');
+    if (enviado == true) {
+      Navigator.popAndPushNamed(context, '/');
+    } else {
+      mostrarSnackBar('No se pudo enviar el reporte');
+    }
   }
 
   void mostrarSnackBar(String mensaje) {

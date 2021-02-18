@@ -12,8 +12,19 @@ class _InicioPageState extends State<InicioPage> {
   final comunicadosProvider = new ComunicadosProvider();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
     comunicadosProvider.cargarComunicados();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    comunicadosProvider.dispoStream();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Container(child: _cardsBuilder()),
     );
@@ -22,13 +33,15 @@ class _InicioPageState extends State<InicioPage> {
   Widget _cardsBuilder() {
     return StreamBuilder(
       stream: comunicadosProvider.comunicadosStream,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         if (snapshot.hasData) {
           final comunidados = snapshot.data;
           return CardsPersonalizada(cardsdata: comunidados);
         } else {
           return Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              semanticsLabel: 'Cargando...',
+            ),
           );
         }
       },

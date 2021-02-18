@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:proteccion_civil/src/models/cards_model.dart';
 
-
 class CardsPersonalizada extends StatelessWidget {
   final List<CardModel> cardsdata;
 

@@ -28,7 +28,8 @@ class MyApp extends StatelessWidget {
           // 'consejo': (BuildContext context) => Consejo(),
           // 'info': (BuildContext context) => Info()
         },
-        theme: ThemeData(primaryColor: Color(0xFFFB6409)),
+        theme: ThemeData(
+            primaryColor: Color(0xFFFB6409), accentColor: Color(0xFFFB6409)),
       ),
     );
   }
