@@ -1,6 +1,7 @@
-# proteccion_civil
+# Protección Civil App Usuario
 
-Proyecto Recepcional applicación movil para Protección Civil
+Este app fue desarrollado como trabajo recepcional. Del Prototipo del Sistema para Atención de Reportes del Municipio de Pöza Rica
 
-## Trabajo tecnico recepcional
+# Tecnologías y herramientas utilizadas
 
+Flutter, Firebase, Google Maps API, Visual Studio Code y Git. 
